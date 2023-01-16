@@ -1,0 +1,37 @@
+{
+  "name": "formua",
+  "version": "1.0.0",
+  "description": "React Formua - Stateless validations",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ufukbakan/formua.git"
+  },
+  "keywords": [
+    "formua",
+    "form",
+    "react",
+    "stateless",
+    "validation",
+    "getter",
+    "data",
+    "formdata",
+    "hook"
+  ],
+  "author": "Ufuk Bakan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ufukbakan/formua/issues"
+  },
+  "homepage": "https://github.com/ufukbakan/formua#readme",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.26"
+  }
+}
