@@ -22,17 +22,24 @@ const { useEffect, useState } = require("react");
  */
 
 /**
+ * @callback Transformer
+ * @param {any} obj
+ * @returns {any}
+ */
+
+/**
  * @typedef {Object} FormuaParams
  * @property {HTMLFormElement | HTMLElement | Element | null} [form]
  * @property {Object<string, Validation>} [validations]
+ * @property {Object<string, Transformer>} [transforms]
  * @property {boolean} [legacyListeners]
  */
 
 /**
  * @typedef {Object} FormuaResult
- * @property {FormData} data
- * @property {ErrorMap} errors
- * @property {boolean} isValid
+ * @property {FormData} formData
+ * @property {ErrorMap} formErrors
+ * @property {boolean} isFormValid
  */
 
 /**
@@ -46,7 +53,7 @@ function Formua(params) {
         const [inputs, setInputs] = useState([]);
         const [errors, setErrors] = useState(undefined);
         
-        const validators = Object.entries(params.validations).map(keyValue => {
+        const validators = Object.entries(params?.validations || {}).map(keyValue => {
             const name = keyValue[0];
             const message = keyValue[1].errorMessage;
             const actualCallback = keyValue[1].validator;
@@ -119,8 +126,6 @@ function Formua(params) {
             setInputs(inputElements);
         }
 
-
-
         const updateFormData = () => {
             const newFormData = {};
             inputs?.forEach(input => {
@@ -167,23 +172,44 @@ function Formua(params) {
                 return undefined;
             }
             if (element instanceof HTMLInputElement && element.type == "checkbox") {
-                return element.checked;
+                if(params?.transforms?.[element.name]){
+                    return params.transforms[element.name](element.checked);
+                }else{
+                    return element.checked;
+                }
             } else if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
-                return element.value;
+                if(params?.transforms?.[element.name]){
+                    return params.transforms[element.name](element.value);
+                }
+                else{
+                    return element.value;
+                }
+            }
+        }
+
+        const validateAll = () => {
+            if(params?.validations){
+                return Object.entries(params?.validations || {}).map(keyValue => {
+                    const name = keyValue[0];
+                    const actualCallback = keyValue[1].validator;
+                    return actualCallback(getValue(inputs.find(i => i.name == name)));
+                }).reduce((prev, next) => prev && next);
+            }else{
+                return true;
             }
         }
 
         return {
-            "data": formData,
-            "errors": errors,
-            "isValid": params?.validations ? !!errors && Object.keys(errors).length < 1 : true
+            "formData": formData,
+            "formErrors": errors,
+            "isFormValid": validateAll()
         };
     }
     else {
         return {
-            "data": {},
-            "errors": {},
-            "isValid": false
+            "formData": {},
+            "formErrors": {},
+            "isFormValid": false
         }
     }
 }
