@@ -50,8 +50,9 @@ function Formua(params) {
     if (typeof window !== "undefined") {
         const form = params?.form || document.querySelector("form");
         const [formData, setFormData] = useState({});
+        const [pureData, setPureData] = useState({});
         const [inputs, setInputs] = useState([]);
-        const [errors, setErrors] = useState(undefined);
+        const [errors, setErrors] = useState({});
         
         const validators = Object.entries(params?.validations || {}).map(keyValue => {
             const name = keyValue[0];
@@ -60,9 +61,9 @@ function Formua(params) {
             return {
                 "field": name,
                 callback() {
-                    if (!actualCallback(getValue(inputs.find(i => i.name == name)))) {
+                    if (!actualCallback(getValue(inputs.find(i => i.name == name), false))) {
                         setErrors({ ...errors, [name]: message })
-                    } else {
+                    } else if(errors[name]) {
                         const tempError = { ...errors };
                         delete tempError[name];
                         setErrors(tempError);
@@ -128,23 +129,29 @@ function Formua(params) {
 
         const updateFormData = () => {
             const newFormData = {};
+            const newPureData = {};
             inputs?.forEach(input => {
                 if (input instanceof HTMLInputElement) {
                     if (input.type != "radio") {
                         newFormData[input.name] = getValue(input);
+                        newPureData[input.name] = getValue(input, false);
                     } else if (!newFormData[input.name] && input.type == "radio") {
                         newFormData[input.name] = getValue(inputs.find(i => i instanceof HTMLInputElement && i.type == "radio" && i.name == input.name && i.checked));
+                        newPureData[input.name] = getValue(inputs.find(i => i instanceof HTMLInputElement && i.type == "radio" && i.name == input.name && i.checked), false);
                     }
                 } else if (input instanceof HTMLTextAreaElement) {
                     newFormData[input.name] = getValue(input);
+                    newPureData[input.name] = getValue(input, false);
                 }
             });
             setFormData(newFormData);
+            setPureData(newPureData);
         }
 
         const updateSingleData = (e) => {
             const inputElement = e.target;
             setFormData((prevData) => ({ ...prevData, [inputElement.name]: getValue(inputElement) }));
+            setPureData((prevData) => ({ ...prevData, [inputElement.name]: getValue(inputElement, false) }));
         }
 
         const addEventListeners = () => {
@@ -153,7 +160,7 @@ function Formua(params) {
                 const validator = validators.find(v => v.field == input.name)?.callback;
                 if (validator) {
                     input.addEventListener("blur", validator);
-                }console.log
+                }
             });
         }
 
@@ -167,18 +174,18 @@ function Formua(params) {
             });
         }
 
-        const getValue = (element) => {
+        const getValue = (element, applyTransforms=true) => {
             if (!element) {
                 return undefined;
             }
             if (element instanceof HTMLInputElement && element.type == "checkbox") {
-                if(params?.transforms?.[element.name]){
+                if(applyTransforms && params?.transforms?.[element.name]){
                     return params.transforms[element.name](element.checked);
                 }else{
                     return element.checked;
                 }
             } else if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
-                if(params?.transforms?.[element.name]){
+                if(applyTransforms && params?.transforms?.[element.name]){
                     return params.transforms[element.name](element.value);
                 }
                 else{
@@ -192,7 +199,7 @@ function Formua(params) {
                 return Object.entries(params?.validations || {}).map(keyValue => {
                     const name = keyValue[0];
                     const actualCallback = keyValue[1].validator;
-                    return actualCallback(getValue(inputs.find(i => i.name == name)));
+                    return actualCallback(getValue(inputs.find(i => i.name == name), false));
                 }).reduce((prev, next) => prev && next);
             }else{
                 return true;
@@ -201,6 +208,7 @@ function Formua(params) {
 
         return {
             "formData": formData,
+            "pureData": pureData,
             "formErrors": errors,
             "isFormValid": validateAll()
         };
@@ -208,6 +216,7 @@ function Formua(params) {
     else {
         return {
             "formData": {},
+            "pureData": {},
             "formErrors": {},
             "isFormValid": false
         }

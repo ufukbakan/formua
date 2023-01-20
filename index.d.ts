@@ -18,7 +18,7 @@ type FormuaParams = {
     transforms?: TransformationMap
 }
 
-type Formdata = {
+export type FormData = {
     [key: string]: any
 }
 
@@ -27,9 +27,10 @@ type StringMap = {
 }
 
 type FormuaResult = {
-    formData: Formdata,
+    formData: FormData,
+    pureData: FormData,
     formErrors: StringMap,
     isFormValid: boolean
 }
 
-export default function Formua(params?: FormuaParams): FormuaResult                                                                                                                                                                                                                             ;
+export default function Formua(params?: FormuaParams): FormuaResult;
