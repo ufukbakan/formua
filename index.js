@@ -2,7 +2,7 @@ const { useEffect, useState } = require("react");
 
 class FormData {
     constructor(data) {
-        this.data = data;
+        this.data = data || {};
     }
     getAll() {
         return this.data;
