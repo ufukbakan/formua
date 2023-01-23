@@ -23,7 +23,13 @@ function minLength(n) {
 }
 
 function minTrimmedLength(n) {
-    return (val) => val.trim().length >= n;
+    return (val) => {
+        if (typeof val === "string") {
+            return val.trim().length >= n;
+        } else {
+            return false;
+        }
+    };
 }
 
 function maxLength(n) {
@@ -31,7 +37,13 @@ function maxLength(n) {
 }
 
 function maxTrimmedLength(n) {
-    return (val) => val.trim().length <= n;
+    return (val) => {
+        if (typeof val === "string") {
+            return val.trim().length <= n;
+        } else {
+            return false;
+        };
+    }
 }
 
 function sameAs(val) {
@@ -189,7 +201,7 @@ function isInteger(val) {
 function isFloat(val) {
     if (typeof val === "string") {
         return val.match(/^\d+(\.\d+)?$/);
-    } else if(typeof val === "number") {
+    } else if (typeof val === "number") {
         return val % 10 !== 0;
     } else {
         return false;
