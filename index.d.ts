@@ -18,19 +18,27 @@ type FormuaParams = {
     transforms?: TransformationMap
 }
 
-export type FormData = {
-    [key: string]: any
-}
-
-type StringMap = {
-    [key:string]: string
+export class FormData {
+    constructor(data?: Record<String, any>);
+    data: Record<string, any>;
+    get(key): any;
+    getAll(): Record<string, any>;
+    has(key): boolean;
+    set(key, value): void;
+    select(...keys: string[]): Record<string, any>;
+    drop(...keys: string[]): Record<string, any>;
+    keys(): string[];
+    values(): any[];
+    entries(): Record<string, any>;
+    toString(): string;
+    toJSON(): Record<string, any>;
 }
 
 type FormuaResult = {
     formData: FormData,
     pureData: FormData,
-    formErrors: StringMap,
+    formErrors: Record<string, any>,
     isFormValid: boolean
 }
 
-export default function Formua(params?: FormuaParams): FormuaResult;
+export function Formua(params?: FormuaParams): FormuaResult;

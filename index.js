@@ -1,8 +1,43 @@
 const { useEffect, useState } = require("react");
 
-/**
- * @typedef {Object<string, any>} FormData
- */
+class FormData {
+    constructor(data) {
+        this.data = data;
+    }
+    getAll() {
+        return this.data;
+    }
+    get(key) {
+        return this.data[key];
+    }
+    set(key, value) {
+        return { ...this.data, [key]: value };
+    }
+    has(key) {
+        return this.data.hasOwnProperty(key);
+    }
+    drop(...keys) {
+        return Object.fromEntries(Object.entries(this.data).filter(keyvalue => !keys.includes(keyvalue[0])));
+    }
+    select(...keys) {
+        return Object.fromEntries(Object.entries(this.data).filter(keyvalue => keys.includes(keyvalue[0])));
+    }
+    keys() {
+        return Object.keys(this.data);
+    }
+    values() {
+        return Object.values(this.data);
+    }
+    entries() {
+        return Object.entries(this.data);
+    }
+    toString() {
+        return JSON.stringify(this.data);
+    }
+    toJSON() {
+        return this.data;
+    }
+}
 
 /**
  * @typedef {Object<string, string>} ErrorMap
@@ -38,6 +73,7 @@ const { useEffect, useState } = require("react");
 /**
  * @typedef {Object} FormuaResult
  * @property {FormData} formData
+ * @property {FormData} pureData
  * @property {ErrorMap} formErrors
  * @property {boolean} isFormValid
  */
@@ -53,7 +89,7 @@ function Formua(params) {
         const [pureData, setPureData] = useState({});
         const [inputs, setInputs] = useState([]);
         const [errors, setErrors] = useState({});
-        
+
         const validators = Object.entries(params?.validations || {}).map(keyValue => {
             const name = keyValue[0];
             const message = keyValue[1].errorMessage;
@@ -63,7 +99,7 @@ function Formua(params) {
                 callback() {
                     if (!actualCallback(getValue(inputs.find(i => i.name == name), false))) {
                         setErrors({ ...errors, [name]: message })
-                    } else if(errors[name]) {
+                    } else if (errors[name]) {
                         const tempError = { ...errors };
                         delete tempError[name];
                         setErrors(tempError);
@@ -174,53 +210,56 @@ function Formua(params) {
             });
         }
 
-        const getValue = (element, applyTransforms=true) => {
+        const getValue = (element, applyTransforms = true) => {
             if (!element) {
                 return undefined;
             }
             if (element instanceof HTMLInputElement && element.type == "checkbox") {
-                if(applyTransforms && params?.transforms?.[element.name]){
+                if (applyTransforms && params?.transforms?.[element.name]) {
                     return params.transforms[element.name](element.checked);
-                }else{
+                } else {
                     return element.checked;
                 }
             } else if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
-                if(applyTransforms && params?.transforms?.[element.name]){
+                if (applyTransforms && params?.transforms?.[element.name]) {
                     return params.transforms[element.name](element.value);
                 }
-                else{
+                else {
                     return element.value;
                 }
             }
         }
 
         const validateAll = () => {
-            if(params?.validations){
+            if (params?.validations) {
                 return Object.entries(params?.validations || {}).map(keyValue => {
                     const name = keyValue[0];
                     const actualCallback = keyValue[1].validator;
                     return actualCallback(getValue(inputs.find(i => i.name == name), false));
                 }).reduce((prev, next) => prev && next);
-            }else{
+            } else {
                 return true;
             }
         }
 
         return {
-            "formData": formData,
-            "pureData": pureData,
+            "formData": new FormData(formData),
+            "pureData": new FormData(pureData),
             "formErrors": errors,
             "isFormValid": validateAll()
         };
     }
     else {
         return {
-            "formData": {},
-            "pureData": {},
+            "formData": new FormData({}),
+            "pureData": new FormData({}),
             "formErrors": {},
             "isFormValid": false
         }
     }
 }
 
-module.exports = Formua;
+module.exports = {
+    Formua,
+    FormData
+}
