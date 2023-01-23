@@ -19,7 +19,7 @@ type FormuaParams = {
 }
 
 export class FormData {
-    constructor(data?: Record<String, any>);
+    constructor(data?: Record<string, any>);
     data: Record<string, any>;
     get(key): any;
     getAll(): Record<string, any>;
