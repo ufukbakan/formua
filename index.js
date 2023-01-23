@@ -1,4 +1,5 @@
 const { useEffect, useState } = require("react");
+const hash = require('object-hash');
 
 class FormData {
     constructor(data) {
@@ -36,6 +37,9 @@ class FormData {
     }
     toJSON() {
         return this.data;
+    }
+    hashcode(){
+        return hash(Object.values(this.data));
     }
 }
 

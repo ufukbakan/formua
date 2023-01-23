@@ -31,6 +31,7 @@ export class FormData {
     entries(): Record<string, any>;
     toString(): string;
     toJSON(): Record<string, any>;
+    hashcode(): string;
 }
 
 type FormuaResult = {

@@ -2,10 +2,12 @@ lockfileVersion: 5.4
 
 specifiers:
   '@types/react': ^18.0.26
+  object-hash: ^3.0.0
   react: ^18.2.0
   react-dom: ^18.2.0
 
 dependencies:
+  object-hash: 3.0.0
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
 
@@ -43,6 +45,11 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
+    dev: false
+
+  /object-hash/3.0.0:
+    resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
+    engines: {node: '>= 6'}
     dev: false
 
   /react-dom/18.2.0_react@18.2.0:
