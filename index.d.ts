@@ -14,7 +14,6 @@ type ValidationsMap = {
 type FormuaParams = {
     form?: HTMLFormElement | HTMLElement | Element | null,
     validations?: ValidationsMap,
-    legacyListeners?: boolean,
     transforms?: TransformationMap
 }
 
@@ -37,7 +36,7 @@ export class FormData {
 type FormuaResult = {
     formData: FormData,
     pureData: FormData,
-    formErrors: Record<string, any>,
+    formErrors: Record<string, string>,
     isFormValid: boolean
 }
 

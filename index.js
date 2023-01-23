@@ -11,7 +11,7 @@ class FormData {
         return this.data[key];
     }
     set(key, value) {
-        return { ...this.data, [key]: value };
+        return new FormData({ ...this.data, [key]: value });
     }
     has(key) {
         return this.data.hasOwnProperty(key);

@@ -22,8 +22,16 @@ function minLength(n) {
     return (val) => val?.length >= n;
 }
 
+function minTrimmedLength(n) {
+    return (val) => val.trim().length >= n;
+}
+
 function maxLength(n) {
     return (val) => val?.length <= n;
+}
+
+function maxTrimmedLength(n) {
+    return (val) => val.trim().length <= n;
 }
 
 function sameAs(val) {
@@ -195,7 +203,9 @@ module.exports = {
     hasNoSpaces,
     hasNoSpecialCharacters,
     minLength,
+    minTrimmedLength,
     maxLength,
+    maxTrimmedLength,
     sameAs,
     equals,
     isEmail,
