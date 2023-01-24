@@ -197,6 +197,7 @@ function Formua(params) {
         const addEventListeners = () => {
             inputs?.forEach(input => {
                 input.addEventListener("input", updateSingleData);
+                input.addEventListener("change", updateSingleData);
                 const validator = validators.find(v => v.field == input.name)?.callback;
                 if (validator) {
                     input.addEventListener("blur", validator);
@@ -207,6 +208,7 @@ function Formua(params) {
         const removeEventListeners = () => {
             inputs?.forEach(input => {
                 input.removeEventListener("input", updateSingleData);
+                input.removeEventListener("change", updateSingleData);
                 const validator = validators.find(v => v.field == input.name)?.callback;
                 if (validator) {
                     input.removeEventListener("blur", validator);
