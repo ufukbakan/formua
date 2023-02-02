@@ -93,7 +93,7 @@ export default function SignupForm() {
             {formErrors.email && ( <div className="error">{formErrors.email}</div> )}
             <input type="password" name="password" placeholder="Password" />
             {formErrors["password"] && ( <div className="error">{formErrors["password"]}</div> )}
-            <button disabled={isFormValid}>Sign Up</button>
+            <button disabled={!isFormValid}>Sign Up</button>
         </form>
     );
 }
