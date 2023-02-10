@@ -153,11 +153,14 @@ function Formua(params) {
         useEffect(() => {
             addEventListeners();
             updateFormData();
-            setValidators(initValidators());
             return () => {
                 removeEventListeners();
             }
         }, [inputs]);
+
+        useEffect(()=> {
+            setValidators(initValidators());
+        }, [Symbol.for(JSON.stringify(params.validations))])
 
         const updateInputs = () => {
             let inputElements = Array.from(form?.querySelectorAll("input,textarea") || []);
