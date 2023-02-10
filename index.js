@@ -38,7 +38,7 @@ class FormData {
     toJSON() {
         return this.data;
     }
-    hashcode(){
+    hashcode() {
         return hash(Object.values(this.data));
     }
 }
@@ -93,24 +93,27 @@ function Formua(params) {
         const [pureData, setPureData] = useState({});
         const [inputs, setInputs] = useState([]);
         const [errors, setErrors] = useState({});
+        const [validators, setValidators] = useState(initValidators())
 
-        const validators = Object.entries(params?.validations || {}).map(keyValue => {
-            const name = keyValue[0];
-            const message = keyValue[1].errorMessage;
-            const actualCallback = keyValue[1].validator;
-            return {
-                "field": name,
-                callback() {
-                    if (!actualCallback(getValue(inputs.find(i => i.name == name), false))) {
-                        setErrors({ ...errors, [name]: message })
-                    } else if (errors[name]) {
-                        const tempError = { ...errors };
-                        delete tempError[name];
-                        setErrors(tempError);
+        function initValidators() {
+            return Object.entries(params?.validations || {}).map(keyValue => {
+                const name = keyValue[0];
+                const message = keyValue[1].errorMessage;
+                const actualCallback = keyValue[1].validator;
+                return {
+                    "field": name,
+                    callback() {
+                        if (!actualCallback(getValue(inputs.find(i => i.name == name), false))) {
+                            setErrors({ ...errors, [name]: message })
+                        } else if (errors[name]) {
+                            const tempError = { ...errors };
+                            delete tempError[name];
+                            setErrors(tempError);
+                        }
                     }
-                }
-            };
-        })
+                };
+            })
+        }
 
         const observeCallback = (mutations) => {
             for (const mutation of mutations) {
@@ -150,6 +153,7 @@ function Formua(params) {
         useEffect(() => {
             addEventListeners();
             updateFormData();
+            setValidators(initValidators());
             return () => {
                 removeEventListeners();
             }
