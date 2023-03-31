@@ -148,6 +148,46 @@ function isUrl(str) {
     }
 }
 
+function isIpv4(str){
+    if (typeof str === "string") {
+        return str.match(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/);
+    } else {
+        return false;
+    }
+}
+
+function isIpv6(str){
+    if (typeof str === "string") {
+        return str.match(/^([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}$/i);
+    } else {
+        return false;
+    }
+}
+
+function isDateStr(str) {
+    if (typeof str === "string") {
+        return str.match(/^(0[1-9]|[12][0-9]|3[01])[\/\-](0[1-9]|1[012])[\/\-]\d{4}$/);
+    } else {
+        return false;
+    }
+}
+
+function isTimeStr(str) {
+    if (typeof str === "string") {
+        return str.match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/);
+    } else {
+        return false;
+    }
+}
+
+function isDateTimeStr(str) {
+    if (typeof str === "string") {
+        return str.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
+    } else {
+        return false;
+    }
+}
+
 function isEmail(str) {
     if (typeof str === "string") {
         return str.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/i);
@@ -223,6 +263,11 @@ module.exports = {
     isEmail,
     isPhoneNumber,
     isUrl,
+    isIpv4,
+    isIpv6,
+    isDateStr,
+    isTimeStr,
+    isDateTimeStr,
     isAlpha,
     isAlphaNum,
     isLowerCase,
