@@ -1,7 +1,11 @@
-type Validation = {
+export type Validation = {
     errorMessage: string,
-    validator: (obj: any) => boolean
+    validator: FormuaValidator<T>
 }
+
+export type FormuaValidator<T> = IndependentValidator<T> | DependentValidator<T>;
+export type IndependentValidator<T> = (value: T) => boolean;
+export type DependentValidator<T> = (fields: Record<string, string | boolean>, value: T) => boolean
 
 type TransformationMap = {
     [key: string]: (obj: any) => any
@@ -11,10 +15,15 @@ type ValidationsMap = {
     [key: string]: Validation
 }
 
-type FormuaParams = {
+export type FormuaParams = {
     form?: HTMLFormElement | HTMLElement | Element | null,
     validations?: ValidationsMap,
     transforms?: TransformationMap
+    /**
+     * use legacy listeners
+     * @default false
+     */
+    legacyListeners?: boolean
 }
 
 export class FormData {
@@ -38,7 +47,8 @@ type FormuaResult = {
     formData: FormData,
     pureData: FormData,
     formErrors: Record<string, string>,
-    isFormValid: boolean
+    isFormValid: boolean,
+    validateForm: (hideErrors = false) => { isValid: boolean, errors: Record<string, string> }
 }
 
 export function Formua(params?: FormuaParams): FormuaResult;

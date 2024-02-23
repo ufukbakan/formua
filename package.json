@@ -1,6 +1,6 @@
 {
   "name": "formua",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "React Formua - Stateless validations",
   "main": "index.js",
   "scripts": {

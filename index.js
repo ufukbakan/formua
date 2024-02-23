@@ -1,4 +1,4 @@
-const { useEffect, useState } = require("react");
+const { useEffect, useState, useMemo, useCallback } = require("react");
 const hash = require('object-hash');
 
 class FormData {
@@ -38,7 +38,7 @@ class FormData {
     toJSON() {
         return this.data;
     }
-    hashcode(){
+    hashcode() {
         return hash(Object.values(this.data));
     }
 }
@@ -93,24 +93,49 @@ function Formua(params) {
         const [pureData, setPureData] = useState({});
         const [inputs, setInputs] = useState([]);
         const [errors, setErrors] = useState({});
+        const [hideReValidationErrors, setHideReValidationErrors] = useState(true);
 
-        const validators = Object.entries(params?.validations || {}).map(keyValue => {
-            const name = keyValue[0];
-            const message = keyValue[1].errorMessage;
-            const actualCallback = keyValue[1].validator;
-            return {
-                "field": name,
-                callback() {
-                    if (!actualCallback(getValue(inputs.find(i => i.name == name), false))) {
-                        setErrors({ ...errors, [name]: message })
-                    } else if (errors[name]) {
-                        const tempError = { ...errors };
-                        delete tempError[name];
-                        setErrors(tempError);
+        const dependentValidators = Object.entries(params?.validations || {})
+            .filter(keyValue => keyValue[1].validator.length === 2)
+            .map(keyValue => {
+                const name = keyValue[0];
+                const message = keyValue[1].errorMessage;
+                /**@type {Validator} */const actualCallback = keyValue[1].validator.bind(this, pureData);
+                return {
+                    "field": name,
+                    callback() {
+                        const result = actualCallback(getValue(inputs.find(i => i.name == name), false));
+                        const fieldErrors = result ? undefined : { [name]: message };
+                        if (!result) {
+                            setErrors(previous => ({ ...previous, ...fieldErrors }))
+                        } else if (errors[name]) {
+                            setErrors(previous => ({ ...previous, [name]: undefined }));
+                        }
+                        return { result, errors: fieldErrors };
                     }
-                }
-            };
-        })
+                };
+            });
+
+        const independentValidators = Object.entries(params?.validations || {})
+            .filter(keyValue => keyValue[1].validator.length < 2)
+            .map(keyValue => {
+                const name = keyValue[0];
+                const message = keyValue[1].errorMessage;
+                const actualCallback = keyValue[1].validator;
+                return {
+                    "field": name,
+                    callback() {
+                        const result = actualCallback(getValue(inputs.find(i => i.name == name), false));
+                        const fieldErrors = result ? undefined : { [name]: message };
+                        if (!result) {
+                            setErrors(previous => ({ ...previous, ...fieldErrors }))
+                        } else if (errors[name]) {
+                            setErrors(previous => ({ ...previous, [name]: undefined }));
+                        }
+                        return { result, errors: fieldErrors };
+                    }
+                };
+            })
 
         const observeCallback = (mutations) => {
             for (const mutation of mutations) {
@@ -198,7 +223,7 @@ function Formua(params) {
             inputs?.forEach(input => {
                 input.addEventListener("input", updateSingleData);
                 input.addEventListener("change", updateSingleData);
-                const validator = validators.find(v => v.field == input.name)?.callback;
+                const validator = independentValidators.find(v => v.field == input.name)?.callback;
                 if (validator) {
                     input.addEventListener("blur", validator);
                 }
@@ -209,7 +234,7 @@ function Formua(params) {
             inputs?.forEach(input => {
                 input.removeEventListener("input", updateSingleData);
                 input.removeEventListener("change", updateSingleData);
-                const validator = validators.find(v => v.field == input.name)?.callback;
+                const validator = independentValidators.find(v => v.field == input.name)?.callback;
                 if (validator) {
                     input.removeEventListener("blur", validator);
                 }
@@ -236,23 +261,29 @@ function Formua(params) {
             }
         }
 
-        const validateAll = () => {
-            if (params?.validations) {
-                return Object.entries(params?.validations || {}).map(keyValue => {
-                    const name = keyValue[0];
-                    const actualCallback = keyValue[1].validator;
-                    return actualCallback(getValue(inputs.find(i => i.name == name), false));
-                }).reduce((prev, next) => prev && next);
-            } else {
-                return true;
-            }
+        const validateForm = () => {
+            const independentsResult = independentValidators?.map(validator => validator.callback()).reduce((acc, next) => {
+                acc.isValid = acc.isValid && next.result;
+                acc.errors = { ...acc.errors, ...next.errors };
+                return acc;
+            }, { isValid: true, errors: {} });
+            const dependenciesResult = dependentValidators?.map(validator => validator.callback()).reduce((acc, next) => {
+                acc.isValid = acc.isValid && next.result;
+                acc.errors = { ...acc.errors, ...next.errors };
+                return acc;
+            }, { isValid: true, errors: {} });
+            return { isValid: dependenciesResult.isValid && independentsResult.isValid, errors: { ...dependenciesResult.errors, ...independentsResult.errors } }
         }
+
+        const lastValidation = useMemo(() => validateForm(hideReValidationErrors), [hash(pureData)]);
+        const isFormValid = lastValidation.isValid;
 
         return {
             "formData": new FormData(formData),
             "pureData": new FormData(pureData),
-            "formErrors": errors,
-            "isFormValid": validateAll()
+            "formErrors": hideReValidationErrors ? {} : errors,
+            "isFormValid": isFormValid,
+            "validateForm": () => { setHideReValidationErrors(false); return lastValidation; }
         };
     }
     else {
@@ -260,7 +291,8 @@ function Formua(params) {
             "formData": new FormData({}),
             "pureData": new FormData({}),
             "formErrors": {},
-            "isFormValid": false
+            "isFormValid": false,
+            "validateForm": () => false
         }
     }
 }
