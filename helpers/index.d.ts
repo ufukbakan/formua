@@ -23,7 +23,9 @@ export function minTrimmedLength(n: number): booleanReturner;
 export function maxLength(n: number): booleanReturner;
 export function maxTrimmedLength(n: number): booleanReturner;
 export function sameAs(val: any): booleanReturner;
+export function sameAsField(fieldName: string): booleanReturner;
 export function equals(val: any): booleanReturner;
+export function equalsToField(fieldName: string): booleanReturner;
 export function required(val: any): boolean;
 
 // transform helpers:

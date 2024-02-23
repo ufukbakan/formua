@@ -50,8 +50,16 @@ function sameAs(val) {
     return (obj) => val === obj;
 }
 
+function sameAsField(fieldName) {
+    return (fields, obj) => fields?.[fieldName] === obj;
+}
+
 function equals(val) {
     return (obj) => val == obj;
+}
+
+function equalsToField(fieldName) {
+    return (fields, obj) => fields?.[fieldName] == obj;
 }
 
 function required(val) {
@@ -148,7 +156,7 @@ function isUrl(str) {
     }
 }
 
-function isIpv4(str){
+function isIpv4(str) {
     if (typeof str === "string") {
         return str.match(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/);
     } else {
@@ -156,7 +164,7 @@ function isIpv4(str){
     }
 }
 
-function isIpv6(str){
+function isIpv6(str) {
     if (typeof str === "string") {
         return str.match(/^([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}$/i);
     } else {
@@ -259,7 +267,9 @@ module.exports = {
     maxLength,
     maxTrimmedLength,
     sameAs,
+    sameAsField,
     equals,
+    equalsToField,
     isEmail,
     isPhoneNumber,
     isUrl,
