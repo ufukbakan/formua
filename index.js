@@ -94,7 +94,7 @@ function Formua(params) {
         const [inputs, setInputs] = useState([]);
         const [errors, setErrors] = useState({});
         const [validatedErrors, setValidatedErrors] = useState({});
-        const blurInputEventHandlersMap = new Map();
+        const [blurInputEventHandlersMap, setBlurInputEventHandlersMap] = useState({});
 
         const dependentValidators = Object.entries(params?.validations || {})
             .filter(keyValue => keyValue[1].validator.length === 2)
@@ -233,7 +233,7 @@ function Formua(params) {
                 }
                 if (eventHandlers.length > 0) {
                     const eventHandler = (event) => eventHandlers.forEach(handler => handler(event));
-                    blurInputEventHandlersMap.set(input.name, eventHandler);
+                    setBlurInputEventHandlersMap(previous => ({ ...previous, [input.name]: eventHandler }))
                     input.addEventListener("blur", eventHandler);
                 }
             });
@@ -243,10 +243,10 @@ function Formua(params) {
             inputs?.forEach(input => {
                 input.removeEventListener("input", updateSingleData);
                 input.removeEventListener("change", updateSingleData);
-                const eventHandler = blurInputEventHandlersMap.get(input.name);
+                const eventHandler = blurInputEventHandlersMap[input.name];
                 if (eventHandler) {
                     input.removeEventListener("blur", eventHandler);
-                    blurInputEventHandlersMap.delete(input.name);
+                    setBlurInputEventHandlersMap(previous => ({ ...previous, [input.name]: undefined }));
                 }
             });
         }
@@ -271,7 +271,7 @@ function Formua(params) {
             }
         }
 
-        const validateForm = () => {
+        const checkFormErrors = () => {
             const independentsResult = independentValidators?.map(validator => validator.callback()).reduce((acc, next) => {
                 acc.isValid = acc.isValid && next.result;
                 acc.errors = { ...acc.errors, ...next.errors };
@@ -285,15 +285,24 @@ function Formua(params) {
             return { isValid: dependenciesResult.isValid && independentsResult.isValid, errors: { ...dependenciesResult.errors, ...independentsResult.errors } }
         }
 
-        const lastValidation = useMemo(() => validateForm(), [hash(pureData)]);
+        const lastValidation = useMemo(() => checkFormErrors(), [hash(pureData)]);
         const isFormValid = lastValidation.isValid;
+        const validateForm = useCallback(() => {
+            inputs.forEach(input => {
+                const handler = blurInputEventHandlersMap[input.name];
+                if (handler) {
+                    handler(null);
+                }
+            });
+            return lastValidation;
+        }, [blurInputEventHandlersMap, lastValidation])
 
         return {
             "formData": new FormData(formData),
             "pureData": new FormData(pureData),
             "formErrors": errors,
             "isFormValid": isFormValid,
-            "validateForm": () => { setValidatedErrors({ ...errors }); return lastValidation; },
+            "validateForm": validateForm,
             "validatedErrors": validatedErrors,
         };
     }
