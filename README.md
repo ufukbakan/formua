@@ -1,5 +1,12 @@
 <h1 align="center">Formua</h1>
-<h2 align="center">React Stateless Validations</h2>
+<h2 align="center">
+React Stateless Validations
+
+--
+
+[![NPM Version](https://img.shields.io/npm/v/formua)](https://www.npmjs.com/package/formua)
+
+</h2>
 
 ## Getting Started
 ### Installation
