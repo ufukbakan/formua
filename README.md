@@ -15,13 +15,16 @@ type FormuaParams = {
     form: HTMLFormElement, // OPTIONAL: Specifies form element explicitly
     validations: ValidationMap, // OPTIONAL: Validations per input name
     transforms: TransformationMap, // OPTIONAL: Transformations per input name
+    legacyListeners: boolean // OPTIONAL: Try enabling this if you face compatibility issues
 }
 
 type FormuaResult = {
     formData: FormData, // Returns transformations applied form data
     pureData: FormData, // Returns pure form data
-    formErrors: Record<string, string>, // Returns error messages of each invalid input field
-    isFormValid: boolean // Returns true if all fields are valid otherwise false
+    formErrors: Record<string, string>, // Returns error messages for each invalid input field
+    isFormValid: boolean // Returns true if all fields are valid otherwise false,
+    validateForm: () => ValidationResult
+    validatedErrors: Record<string, string> // If validateForm method is called once then returns error messages for each invalid input field otherwise returns errors messages for only fields those triggered blur event
 }
 
 // FormData is completely immutable
@@ -47,6 +50,11 @@ type ValidationMap = {
 type Validation = {
     errorMessage: string,
     validator: (o: any) => boolean
+}
+
+type ValidationResult = {
+    isValid: boolean,
+    errors: Record<string, string>
 }
 
 type TransformationMap = {
@@ -106,13 +114,12 @@ The example below shows how to use Formua to validate, transform and post a form
 ```tsx
 import axios from "axios";
 import { Formua, FormData } from "formua";
-import { chainAnd, hasNoSpecialCharacters, isEmail, minLength, minTrimmedLength, sameAs, trim } from "formua/helpers";
+import { chainAnd, hasNoSpecialCharacters, isEmail, minLength, minTrimmedLength, sameAs, trim, sameAsField } from "formua/helpers";
 import { useEffect, useRef } from "react";
 
 export default function SignupForm() {
 
     const formRef = useRef<HTMLFormElement>(null);
-    const lastData = useRef<FormData>();
     const { formData, pureData, formErrors, isFormValid } = Formua({
         form: formRef.current,
         validations: {
@@ -126,7 +133,7 @@ export default function SignupForm() {
             },
             "email-again": {
                 errorMessage: "Emails do not match",
-                validator: sameAs(lastData.current?.get("email"))
+                validator: sameAsField("email")
             },
             password: {
                 validator: minLength(8),
@@ -134,17 +141,13 @@ export default function SignupForm() {
             },
             "password-again": {
                 errorMessage: "Passwords do not match",
-                validator: sameAs(lastData.current?.get("password"))
+                validator: sameAsField("password")
             }
         },
         transforms: {
             username: trim
         }
     });
-
-    useEffect(() => {
-        lastData.current = pureData;
-    }, [pureData])
 
     function submitHandler() {
         axios.post("/signup", formData.getAll())
