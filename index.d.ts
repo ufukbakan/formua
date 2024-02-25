@@ -1,4 +1,4 @@
-export type Validation = {
+export type Validation<T> = {
     errorMessage: string,
     validator: FormuaValidator<T>
 }
@@ -8,11 +8,11 @@ export type IndependentValidator<T> = (value: T) => boolean;
 export type DependentValidator<T> = (fields: Record<string, string | boolean>, value: T) => boolean
 
 type TransformationMap = {
-    [key: string]: (obj: any) => any
+    [key: string]: <T, R>(obj: T) => R
 }
 
 type ValidationsMap = {
-    [key: string]: Validation
+    [key: string]: Validation<any>
 }
 
 export type FormuaParams = {
@@ -48,7 +48,8 @@ type FormuaResult = {
     pureData: FormData,
     formErrors: Record<string, string>,
     isFormValid: boolean,
-    validateForm: (hideErrors = false) => { isValid: boolean, errors: Record<string, string> }
+    validateForm: () => { isValid: boolean, errors: Record<string, string> },
+    validatedErrors: Record<string, string>,
 }
 
 export function Formua(params?: FormuaParams): FormuaResult;
