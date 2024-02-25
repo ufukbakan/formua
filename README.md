@@ -2,8 +2,6 @@
 <h2 align="center">
 React Stateless Validations
 
---
-
 [![NPM Version](https://img.shields.io/npm/v/formua)](https://www.npmjs.com/package/formua)
 
 </h2>
