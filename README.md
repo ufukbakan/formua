@@ -14,7 +14,12 @@ React Stateless Validations
 npm i formua
 ```
 
-### Interface
+### What's New In 1.2.1
+- validateForm method added to formua result object
+- validatedErrors added to formua result object
+
+
+### API
 ```ts
 function Formua(params: FormuaParams /*OPTIONAL*/ ): FormuaResult;
 
