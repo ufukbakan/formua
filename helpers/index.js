@@ -1,9 +1,9 @@
 function chainAnd(...callbacks) {
-    return (val) => callbacks.map(callback => callback(val)).reduce((prev, next) => prev && next);
+    return (val) => callbacks.map((callback) => callback(val)).reduce((prev, next) => prev && next);
 }
 
 function chainOr(...args) {
-    return (val) => args.map(callback => callback(val)).reduce((prev, next) => prev || next);
+    return (val) => args.map((callback) => callback(val)).reduce((prev, next) => prev || next);
 }
 
 function chainTransform(...args) {
@@ -11,7 +11,7 @@ function chainTransform(...args) {
 }
 
 function hasNoSpaces(val) {
-    return typeof val === "string" ? !(/\s/.test(val)) : false;
+    return typeof val === "string" ? !/\s/.test(val) : false;
 }
 
 function hasNoSpecialCharacters(val) {
@@ -42,8 +42,8 @@ function maxTrimmedLength(n) {
             return val.trim().length <= n;
         } else {
             return false;
-        };
-    }
+        }
+    };
 }
 
 function sameAs(val) {
@@ -63,14 +63,12 @@ function equalsToField(fieldName) {
 }
 
 function required(val) {
-    if (typeof val !== "boolean")
-        return !!val;
-    else
-        return true;
+    if (typeof val !== "boolean") return !!val;
+    else return true;
 }
 
 /**
- * @param {string} str 
+ * @param {string} str
  * @returns string
  */
 function toUpper(str) {
@@ -78,8 +76,8 @@ function toUpper(str) {
 }
 
 /**
- * 
- * @param {string} str 
+ *
+ * @param {string} str
  * @returns {string}
  */
 function toLocaleUpper(str) {
@@ -87,7 +85,7 @@ function toLocaleUpper(str) {
 }
 
 /**
- * @param {string} str 
+ * @param {string} str
  * @returns {string}
  */
 function toLower(str) {
@@ -95,8 +93,8 @@ function toLower(str) {
 }
 
 /**
- * 
- * @param {string} str 
+ *
+ * @param {string} str
  * @returns {string}
  */
 function toLocaleLower(str) {
@@ -104,18 +102,17 @@ function toLocaleLower(str) {
 }
 
 /**
- * 
- * @param {string} str 
+ *
+ * @param {string} str
  * @returns {string}
  */
 function trim(str) {
-    return str.trim()
+    return str.trim();
 }
 
-
 /**
- * 
- * @param {string} str 
+ *
+ * @param {string} str
  * @returns {string}
  */
 function trimEnd(str) {
@@ -123,14 +120,13 @@ function trimEnd(str) {
 }
 
 /**
- * 
- * @param {string} str 
+ *
+ * @param {string} str
  * @returns {string}
  */
 function trimStart(str) {
     return str.trimStart();
 }
-
 
 function postfix(str) {
     return (val) => val + str.toString();
@@ -212,7 +208,7 @@ function isAlpha(str) {
     }
 }
 
-function isAlphaNum(str) {
+function isAlphaNumeric(str) {
     if (typeof str === "string") {
         return str.match(/^[a-zA-Z0-9]+$/);
     } else {
@@ -279,7 +275,7 @@ module.exports = {
     isTimeStr,
     isDateTimeStr,
     isAlpha,
-    isAlphaNum,
+    isAlphaNumeric,
     isLowerCase,
     isUpperCase,
     isInteger,
@@ -295,5 +291,5 @@ module.exports = {
     trimEnd,
     trimStart,
     prefix,
-    postfix
-}
+    postfix,
+};

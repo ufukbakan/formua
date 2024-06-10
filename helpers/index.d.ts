@@ -1,5 +1,5 @@
 type IndependentValidator<T> = (value: T) => boolean;
-type DependentValidator<T> = (fields: Record<string, string | boolean>, value: T) => boolean
+type DependentValidator<T> = (fields: Record<string, string | boolean>, value: T) => boolean;
 
 // validation helpers:
 export function chainAnd<T>(...callbacks: IndependentValidator<T>[]): IndependentValidator<T>;
@@ -13,9 +13,9 @@ export function isDateStr(val: any): boolean;
 export function isTimeStr(val: any): boolean;
 export function isDateTimeStr(val: any): boolean;
 export function isAlpha(val: any): boolean;
-export function isAlphanumeric(val: any): boolean;
-export function isLowercase(val: any): boolean;
-export function isUppercase(val: any): boolean;
+export function isAlphaNumeric(val: any): boolean;
+export function isLowerCase(val: any): boolean;
+export function isUpperCase(val: any): boolean;
 export function isInteger(val: any): boolean;
 export function isFloat(val: any): boolean;
 export function hasNoSpaces(val: string): boolean;
